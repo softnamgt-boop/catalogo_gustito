@@ -476,7 +476,10 @@
     // ============================================================
     //  CONFIGURACIÓN — Cambia esta URL por la tuya de Apps Script
     // ============================================================
-    var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzE9C75Adl44lQTzfSRqPLxWTvG-iH5TNwP2l7xc-Rj4ukcFyuQZVz9f3RlXT6t3cP6/exec?v=json';
+    // URL directa de Apps Script
+    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzE9C75Adl44lQTzfSRqPLxWTvG-iH5TNwP2l7xc-Rj4ukcFyuQZVz9f3RlXT6t3cP6/exec?v=json';
+    // Proxy CORS para evitar bloqueos del navegador
+    var BACKEND_URL = 'https://corsproxy.io/?' + encodeURIComponent(APPS_SCRIPT_URL);
     // ============================================================
 
     var todosLosProductos=[];var categoriaSeleccionada='TODAS';var marcaSeleccionada='TODAS';var textoBusqueda='';var carrito=[];var configGlobal={};var productoModalActual=-1;var anunciosCargados=false;var tipoEntrega='';var vistaLista=false;
