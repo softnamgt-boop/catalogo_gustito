@@ -476,7 +476,7 @@
     // ============================================================
     //  CONFIGURACIÓN — Cambia esta URL por la tuya de Apps Script
     // ============================================================
-    var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzE9C75Adl44lQTzfSRqPLxWTvG-iH5TNwP2l7xc-Rj4ukcFyuQZVz9f3RlXT6t3cP6/exec?v=json';
+    var BACKEND_URL = 'https://lingering-violet-02c4.softnam-gt.workers.dev';
     // ============================================================
 
     var todosLosProductos=[];var categoriaSeleccionada='TODAS';var marcaSeleccionada='TODAS';var textoBusqueda='';var carrito=[];var configGlobal={};var productoModalActual=-1;var anunciosCargados=false;var tipoEntrega='';var vistaLista=false;
@@ -581,34 +581,29 @@
     document.addEventListener('keydown',function(e){if(e.key==='Escape'){cerrarAnuncios();cerrarModal(null);cerrarCarrito();cerrarModalCliente();cerrarFiltros(null);}});
 
     // ============================================================
-    //  CARGA DE DATOS — JSONP (evita restricciones CORS de Apps Script)
+    //  CARGA DE DATOS — via Cloudflare Worker (sin restricciones CORS)
     // ============================================================
     function cargarDatos(){
       document.getElementById('lbl-estado').textContent='Cargando...';
-      window._catalogoCallback = function(datos){
-        if(datos.error){document.getElementById('lbl-estado').textContent='Error al cargar';return;}
-        if(datos.config)aplicarConfig(datos.config);
-        todosLosProductos=datos.productos||[];
-        _cats=datos.categorias||[];_marcas=datos.marcas||[];
-        renderizarChipsCategorias();renderizarChipsMarcas();
-        renderizarProductos();
-        if(!anunciosCargados&&datos.anuncios&&datos.anuncios.length>0){
-          anunciosCargados=true;
-          iniciarPopup(datos.anuncios);
-          iniciarAnunciosMovil(datos.anuncios);
-          iniciarAnunciosPc(datos.anuncios);
-        }
-        var ahora=new Date();var h=ahora.getHours();var m=ahora.getMinutes()<10?'0'+ahora.getMinutes():''+ahora.getMinutes();
-        document.getElementById('lbl-estado').textContent='Actualizado a las '+h+':'+m;
-        // Limpiar script del DOM
-        var old=document.getElementById('jsonp-script');if(old)old.remove();
-      };
-      var old=document.getElementById('jsonp-script');if(old)old.remove();
-      var s=document.createElement('script');
-      s.id='jsonp-script';
-      s.src=BACKEND_URL+'&callback=_catalogoCallback';
-      s.onerror=function(){document.getElementById('lbl-estado').textContent='Sin conexión al servidor';};
-      document.head.appendChild(s);
+      fetch(BACKEND_URL)
+        .then(function(r){ return r.json(); })
+        .then(function(datos){
+          if(datos.error){document.getElementById('lbl-estado').textContent='Error al cargar';return;}
+          if(datos.config)aplicarConfig(datos.config);
+          todosLosProductos=datos.productos||[];
+          _cats=datos.categorias||[];_marcas=datos.marcas||[];
+          renderizarChipsCategorias();renderizarChipsMarcas();
+          renderizarProductos();
+          if(!anunciosCargados&&datos.anuncios&&datos.anuncios.length>0){
+            anunciosCargados=true;
+            iniciarPopup(datos.anuncios);
+            iniciarAnunciosMovil(datos.anuncios);
+            iniciarAnunciosPc(datos.anuncios);
+          }
+          var ahora=new Date();var h=ahora.getHours();var m=ahora.getMinutes()<10?'0'+ahora.getMinutes():''+ahora.getMinutes();
+          document.getElementById('lbl-estado').textContent='Actualizado a las '+h+':'+m;
+        })
+        .catch(function(){document.getElementById('lbl-estado').textContent='Sin conexión al servidor';});
     }
     cargarDatos();
   </script>
